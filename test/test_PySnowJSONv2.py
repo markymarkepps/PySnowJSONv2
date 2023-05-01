@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, Mock
-from PySNOW-JSONv2 import ServiceNowAPI
+from src.PySnowJSONv2 import ServiceNowJSONv2
 
 class TestServiceNowAPI(unittest.TestCase):
     
@@ -9,7 +9,7 @@ class TestServiceNowAPI(unittest.TestCase):
         self.username = 'myusername'
         self.password = 'mypassword'
         self.session = Mock()
-        self.api = ServiceNowAPI(self.instance, self.username, self.password, self.session)
+        self.api = ServiceNowJSONv2(self.instance, self.username, self.password, self.session)
     
     def test_get_path_without_sys_id(self):
         path = self.api._get_path('incident')
@@ -25,30 +25,30 @@ class TestServiceNowAPI(unittest.TestCase):
         records = self.api.get_records('incident', 'short_description=Test Incident')
         self.assertEqual(records, response['records'])
     
-    @patch('servicenowapi.requests.Session')
+    @patch('ServiceNowJSONv2.requests.Session')
     def test_create_record(self, mock_session):
         mock_response = Mock()
         mock_response.json.return_value = {'result': {'sys_id': '123'}}
         mock_session.return_value.request.return_value = mock_response
-        api = ServiceNowAPI(self.instance, self.username, self.password)
+        api = ServiceNowJSONv2(self.instance, self.username, self.password)
         data = {'short_description': 'Test Incident'}
         sys_id = api.create_record('incident', data)
         self.assertEqual(sys_id, '123')
     
-    @patch('servicenowapi.requests.Session')
+    @patch('ServiceNowJSONv2.requests.Session')
     def test_update_record(self, mock_session):
         mock_response = Mock()
         mock_response.json.return_value = {'result': {'sys_id': '123'}}
         mock_session.return_value.request.return_value = mock_response
-        api = ServiceNowAPI(self.instance, self.username, self.password)
+        api = ServiceNowJSONv2(self.instance, self.username, self.password)
         data = {'short_description': 'Test Incident (updated)'}
         sys_id = api.update_record('incident', '123', data)
         self.assertEqual(sys_id, '123')
     
-    @patch('servicenowapi.requests.Session')
+    @patch('ServiceNowJSONv2.requests.Session')
     def test_delete_record(self, mock_session):
         mock_response = Mock()
         mock_session.return_value.request.return_value = mock_response
-        api = ServiceNowAPI(self.instance, self.username, self.password)
+        api = ServiceNowJSONv2(self.instance, self.username, self.password)
         api.delete_record('incident', '123')
         mock_session.return_value.request.assert_called_once_with('POST', 'https://myinstance.service-now.com/incident.do?sys_id=123&sysparm_action=deleteRecord')

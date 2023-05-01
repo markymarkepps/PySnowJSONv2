@@ -2,7 +2,7 @@ import requests
 import json
 
 
-class ServiceNowAPI:
+class ServiceNowJSONv2:
     def __init__(self, instance, username, password, session=None):
         """
         Initializes a new ServiceNowAPI object.
